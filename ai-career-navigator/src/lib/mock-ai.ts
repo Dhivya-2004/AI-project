@@ -13,8 +13,24 @@ export interface ResumeAnalysis {
   summary: string;
   strengths: string[];
   improvements: string[];
-  email?: string;
-  phone?: string;
+  personalInfo?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    location?: string;
+  };
+  educationDetails?: Array<{
+    degree?: string;
+    institution?: string;
+    year?: string;
+  }>;
+  experienceDetails?: Array<{
+    role?: string;
+    company?: string;
+    duration?: string;
+    description?: string[];
+  }>;
+  certifications?: string[];
 }
 
 export interface JobMatch {
@@ -44,113 +60,6 @@ const TECH_SKILLS = [
   "Agile", "Scrum", "Project Management", "Communication", "Leadership",
 ];
 
-const SUGGESTIONS = [
-  "Add quantifiable achievements to your experience section (e.g., 'Increased performance by 40%')",
-  "Include a professional summary at the top of your resume",
-  "Use action verbs to start each bullet point (e.g., 'Developed', 'Led', 'Optimized')",
-  "Tailor your skills section to match the job description keywords",
-  "Add links to your GitHub, portfolio, or LinkedIn profile",
-  "Ensure consistent formatting throughout the document",
-  "Include relevant certifications and online courses",
-  "Keep resume to 1-2 pages maximum",
-  "Use a clean, ATS-friendly template without complex graphics",
-  "Spell-check and grammar-check your entire resume",
-];
-
-function extractSkillsFromText(text: string): string[] {
-  const found: string[] = [];
-  const lowerText = text.toLowerCase();
-  for (const skill of TECH_SKILLS) {
-    if (lowerText.includes(skill.toLowerCase())) {
-      found.push(skill);
-    }
-  }
-  // Add some random skills to simulate more extraction
-  const extras = TECH_SKILLS.filter(s => !found.includes(s)).slice(0, 3);
-  return [...found, ...extras].slice(0, 12);
-}
-
-export async function analyzeResume(resumeText: string): Promise<ResumeAnalysis> {
-  // Check if real OpenAI API key is available
-  if (process.env.OPENAI_API_KEY) {
-    return await analyzeWithOpenAI(resumeText);
-  }
-
-  // Mock analysis
-  await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-
-  const extractedSkills = extractSkillsFromText(resumeText);
-  const allSkills = TECH_SKILLS.filter(s => !extractedSkills.includes(s));
-  const missingSkills = allSkills.slice(0, 6);
-
-  // Calculate mock ATS score based on content richness
-  const wordCount = resumeText.split(" ").length;
-  const baseScore = Math.min(45 + Math.floor(wordCount / 20), 75);
-  const skillBonus = Math.min(extractedSkills.length * 2, 20);
-  const atsScore = Math.min(baseScore + skillBonus, 95);
-
-  const shuffled = [...SUGGESTIONS].sort(() => Math.random() - 0.5);
-
-  // Extract email and phone using RegExp
-  const emailMatch = resumeText.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
-  const phoneMatch = resumeText.match(/(\+91[- ]?)?[6-9]\d{9}/) || resumeText.match(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/);
-
-  return {
-    atsScore,
-    extractedSkills,
-    missingSkills,
-    suggestions: shuffled.slice(0, 5),
-    experience: {
-      years: Math.floor(Math.random() * 8) + 1,
-      level: atsScore > 75 ? "Senior" : atsScore > 60 ? "Mid-level" : "Junior",
-    },
-    education: "Bachelor's degree detected",
-    summary: "Your resume shows strong technical skills with room for improvement in presentation and ATS optimization.",
-    strengths: [
-      "Strong technical skill set",
-      "Relevant work experience",
-      "Good educational background",
-    ],
-    improvements: [
-      "Add more quantifiable achievements",
-      "Optimize for ATS keywords",
-      "Strengthen professional summary",
-    ],
-    email: emailMatch ? emailMatch[0] : undefined,
-    phone: phoneMatch ? phoneMatch[0] : undefined,
-  };
-}
-
-async function analyzeWithOpenAI(resumeText: string): Promise<ResumeAnalysis> {
-  const { default: OpenAI } = await import("openai");
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-  const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [
-      {
-        role: "system",
-        content: `You are an expert ATS (Applicant Tracking System) and resume analyzer. 
-        Analyze the given resume and return a JSON response with the following structure:
-        {
-          "atsScore": number (0-100),
-          "extractedSkills": string[],
-          "missingSkills": string[] (common skills not found),
-          "suggestions": string[] (5 improvement suggestions),
-          "experience": { "years": number, "level": "Junior|Mid-level|Senior" },
-          "education": string,
-          "summary": string,
-          "strengths": string[],
-          "improvements": string[]
-        }`,
-      },
-      { role: "user", content: `Analyze this resume:\n\n${resumeText}` },
-    ],
-    response_format: { type: "json_object" },
-  });
-
-  return JSON.parse(response.choices[0].message.content || "{}");
-}
 
 export async function getJobRecommendations(skills: string[]): Promise<JobMatch[]> {
   if (process.env.OPENAI_API_KEY) {

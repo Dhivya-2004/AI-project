@@ -12,6 +12,24 @@ interface ResumeAnalysis {
   summary: string;
   strengths: string[];
   improvements: string[];
+  personalInfo?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
+  educationDetails?: Array<{
+    degree?: string;
+    institution?: string;
+    year?: string;
+  }>;
+  experienceDetails?: Array<{
+    role?: string;
+    company?: string;
+    duration?: string;
+    description?: string[];
+  }>;
+  certifications?: string[];
 }
 
 function ATSScoreGauge({ score }: { score: number }) {
@@ -83,23 +101,18 @@ export default function ResumePage() {
     formData.append("file", file);
 
     try {
-      const uploadRes = await fetch("/api/resume/upload", { method: "POST", body: formData });
-      if (!uploadRes.ok) throw new Error("Upload failed");
-      const { resumeId } = await uploadRes.json();
-
+      const processRes = await fetch("/api/resume/process", { method: "POST", body: formData });
+      const result = await processRes.json();
+      if (!processRes.ok) throw new Error(result.error || "Processing failed");
+      
       setUploading(false);
       setAnalyzing(true);
-
-      const analyzeRes = await fetch("/api/resume/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resumeId }),
-      });
-      if (!analyzeRes.ok) throw new Error("Analysis failed");
-      const result = await analyzeRes.json();
+      // Simulating a brief delay for UI since the single request does everything
+      await new Promise(r => setTimeout(r, 500));
+      
       setAnalysis(result.analysis);
     } catch (e) {
-      setError("Failed to process resume. Please try again.");
+      setError(e instanceof Error ? e.message : "Failed to process resume. Please try again.");
       console.error(e);
     } finally {
       setUploading(false);
@@ -203,6 +216,28 @@ export default function ResumePage() {
         {/* Analysis Results */}
         {analysis && (
           <div className="animate-fade-in">
+            {/* Personal Info Row */}
+            {analysis.personalInfo && (
+              <div className="card" style={{ marginBottom: "24px", display: "flex", flexWrap: "wrap", gap: "24px", alignItems: "center" }}>
+                <div style={{ flex: "1 1 200px" }}>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>Name</div>
+                  <div style={{ fontSize: "18px", fontWeight: 700 }}>{analysis.personalInfo.name || "N/A"}</div>
+                </div>
+                <div style={{ flex: "1 1 200px" }}>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>Email</div>
+                  <div style={{ fontSize: "16px", fontWeight: 500 }}>{analysis.personalInfo.email || "N/A"}</div>
+                </div>
+                <div style={{ flex: "1 1 200px" }}>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>Phone</div>
+                  <div style={{ fontSize: "16px", fontWeight: 500 }}>{analysis.personalInfo.phone || "N/A"}</div>
+                </div>
+                <div style={{ flex: "1 1 200px" }}>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>Address</div>
+                  <div style={{ fontSize: "16px", fontWeight: 500 }}>{analysis.personalInfo.address || "N/A"}</div>
+                </div>
+              </div>
+            )}
+
             {/* Score + Summary Row */}
             <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "24px", marginBottom: "24px" }}>
               <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "32px 40px" }}>
@@ -212,20 +247,20 @@ export default function ResumePage() {
               <div className="card">
                 <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "12px" }}>📋 Resume Summary</h3>
                 <p style={{ fontSize: "14px", color: "var(--text-secondary)", marginBottom: "16px", lineHeight: 1.7 }}>
-                  {analysis.summary}
+                  {analysis.summary || "No summary provided."}
                 </p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px" }}>
                   <div style={{ background: "var(--surface)", borderRadius: "10px", padding: "12px" }}>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px" }}>Experience</div>
-                    <div style={{ fontSize: "14px", fontWeight: 600 }}>{analysis.experience.years} years</div>
+                    <div style={{ fontSize: "14px", fontWeight: 600 }}>{analysis.experience?.years || 0} years</div>
                   </div>
                   <div style={{ background: "var(--surface)", borderRadius: "10px", padding: "12px" }}>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px" }}>Level</div>
-                    <div style={{ fontSize: "14px", fontWeight: 600 }}>{analysis.experience.level}</div>
+                    <div style={{ fontSize: "14px", fontWeight: 600 }}>{analysis.experience?.level || "Unknown"}</div>
                   </div>
                   <div style={{ background: "var(--surface)", borderRadius: "10px", padding: "12px" }}>
                     <div style={{ fontSize: "11px", color: "var(--text-muted)", marginBottom: "4px" }}>Education</div>
-                    <div style={{ fontSize: "13px", fontWeight: 600 }}>{analysis.education}</div>
+                    <div style={{ fontSize: "13px", fontWeight: 600 }}>{analysis.education || "Unknown"}</div>
                   </div>
                 </div>
               </div>
@@ -235,10 +270,10 @@ export default function ResumePage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "24px" }}>
               <div className="card">
                 <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "12px" }}>
-                  ✅ Detected Skills ({analysis.extractedSkills.length})
+                  ✅ Detected Skills ({(analysis.extractedSkills || []).length})
                 </h3>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                  {analysis.extractedSkills.map((skill) => (
+                  {(analysis.extractedSkills || []).map((skill) => (
                     <span key={skill} className="skill-chip skill-chip-success">{skill}</span>
                   ))}
                 </div>
@@ -246,16 +281,92 @@ export default function ResumePage() {
 
               <div className="card">
                 <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "12px" }}>
-                  ❌ Missing Skills ({analysis.missingSkills.length})
+                  ❌ Missing Skills ({(analysis.missingSkills || []).length})
                 </h3>
                 <p style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "12px" }}>
                   Consider adding these in-demand skills
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                  {analysis.missingSkills.map((skill) => (
+                  {(analysis.missingSkills || []).map((skill) => (
                     <span key={skill} className="skill-chip skill-chip-missing">{skill}</span>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Certifications Row */}
+            {analysis.certifications && analysis.certifications.length > 0 && (
+              <div className="card" style={{ marginBottom: "24px" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "12px" }}>
+                  🏆 Certifications & Licenses
+                </h3>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {analysis.certifications.map((cert) => (
+                    <span key={cert} style={{ background: "rgba(99,102,241,0.1)", color: "#4f46e5", border: "1px solid rgba(99,102,241,0.2)", padding: "6px 12px", borderRadius: "16px", fontSize: "13px", fontWeight: 500 }}>
+                      {cert}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Experience and Education Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "24px" }}>
+              <div className="card">
+                <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px" }}>
+                  💼 Experience History
+                </h3>
+                {(!analysis.experienceDetails || analysis.experienceDetails.length === 0) ? (
+                  <p style={{ fontSize: "13px", color: "var(--text-muted)" }}>No detailed experience found.</p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {analysis.experienceDetails.map((exp, i) => (
+                      <div key={i} style={{ padding: "12px", background: "var(--surface)", borderRadius: "10px", border: "1px solid var(--border)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: "14px" }}>{exp.role || "Role Not Specified"}</div>
+                            <div style={{ color: "var(--text-secondary)", fontSize: "13px" }}>{exp.company || "Company Not Specified"}</div>
+                          </div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", background: "rgba(0,0,0,0.05)", padding: "2px 8px", borderRadius: "12px" }}>
+                            {exp.duration || "Duration Unknown"}
+                          </div>
+                        </div>
+                        {exp.description && exp.description.length > 0 && (
+                          <ul style={{ margin: 0, paddingLeft: "16px", fontSize: "12px", color: "var(--text-secondary)", display: "flex", flexDirection: "column", gap: "4px" }}>
+                            {exp.description.map((desc, j) => (
+                              <li key={j}>{desc}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="card">
+                <h3 style={{ fontSize: "16px", fontWeight: 700, marginBottom: "16px" }}>
+                  🎓 Education History
+                </h3>
+                {(!analysis.educationDetails || analysis.educationDetails.length === 0) ? (
+                  <p style={{ fontSize: "13px", color: "var(--text-muted)" }}>No detailed education found.</p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    {analysis.educationDetails.map((edu, i) => (
+                      <div key={i} style={{ padding: "12px", background: "var(--surface)", borderRadius: "10px", border: "1px solid var(--border)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: "14px" }}>{edu.degree || "Degree Not Specified"}</div>
+                            <div style={{ color: "var(--text-secondary)", fontSize: "13px", marginTop: "2px" }}>{edu.institution || "Institution Not Specified"}</div>
+                          </div>
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", background: "rgba(0,0,0,0.05)", padding: "2px 8px", borderRadius: "12px" }}>
+                            {edu.year || "Year Unknown"}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -266,7 +377,7 @@ export default function ResumePage() {
                   💡 AI Improvement Suggestions
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {analysis.suggestions.map((suggestion, i) => (
+                  {(analysis.suggestions || []).map((suggestion, i) => (
                     <div
                       key={i}
                       style={{
@@ -309,7 +420,7 @@ export default function ResumePage() {
                   💪 Strengths
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
-                  {analysis.strengths.map((s, i) => (
+                  {(analysis.strengths || []).map((s, i) => (
                     <div key={i} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                       <span style={{ color: "#34d399", fontSize: "16px" }}>✓</span>
                       <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{s}</span>
@@ -321,7 +432,7 @@ export default function ResumePage() {
                   🔧 Areas to Improve
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {analysis.improvements.map((s, i) => (
+                  {(analysis.improvements || []).map((s, i) => (
                     <div key={i} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                       <span style={{ color: "#fbbf24", fontSize: "16px" }}>→</span>
                       <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>{s}</span>
