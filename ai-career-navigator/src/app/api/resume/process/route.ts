@@ -6,11 +6,9 @@ import OpenAI from "openai";
 async function extractText(buffer: Buffer, mimeType: string, fileName: string): Promise<string> {
   try {
     if (mimeType === "application/pdf" || fileName.endsWith(".pdf")) {
-      const { PDFParse } = await import("pdf-parse");
-      const parser = new PDFParse({ data: new Uint8Array(buffer) });
-      await parser.load();
-      const textResult = await parser.getText();
-      return textResult.text;
+      const pdfParse = (await import("pdf-parse")).default;
+      const data = await pdfParse(buffer);
+      return data.text;
     } else if (
       mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
       fileName.endsWith(".docx")
