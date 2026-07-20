@@ -34,7 +34,7 @@ export default function SignInPage() {
           : "Something went wrong. Please try again."
       );
     } else {
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     }
     setLoading(false);
   };

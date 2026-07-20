@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   basePath: "/api/auth",
+  trustHost: true,
   providers: [
     Credentials({
       name: "credentials",

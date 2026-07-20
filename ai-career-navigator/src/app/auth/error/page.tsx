@@ -1,42 +1,35 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 function ErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
+  let errorMessage = "An unexpected error occurred during authentication.";
+  if (error === "Configuration") {
+    errorMessage = "There is a problem with the server configuration.";
+  } else if (error === "AccessDenied") {
+    errorMessage = "You do not have permission to sign in.";
+  } else if (error === "Verification") {
+    errorMessage = "The verification link was invalid or has expired.";
+  } else if (error === "CredentialsSignin") {
+    errorMessage = "Invalid email or password.";
+  }
+
   return (
-    <div style={{ textAlign: "center", marginBottom: "40px" }}>
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "56px",
-          height: "56px",
-          borderRadius: "16px",
-          background: "var(--danger, #ef4444)",
-          marginBottom: "16px",
-          fontSize: "24px",
-          color: "white"
-        }}
-      >
-        ⚠️
-      </div>
-      <h1
-        style={{ fontSize: "28px", fontWeight: 800, marginBottom: "8px" }}
-      >
-        Authentication Error
-      </h1>
-      <p style={{ color: "var(--text-secondary)", fontSize: "14px", marginBottom: "24px" }}>
-        {error ? `Error details: ${error}` : "An error occurred during authentication."}
+    <div style={{ textAlign: "center", padding: "40px" }}>
+      <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠️</div>
+      <h1 style={{ fontSize: "24px", fontWeight: 700, marginBottom: "16px" }}>Authentication Error</h1>
+      <p style={{ color: "var(--text-secondary)", marginBottom: "32px" }}>
+        {errorMessage}
       </p>
-      
-      <Link href="/auth/signin" className="btn-primary" style={{ textDecoration: "none", padding: "10px 20px" }}>
-        Back to Sign In
+      <Link href="/auth/signin">
+        <button className="btn-primary" style={{ padding: "10px 24px" }}>
+          Back to Sign In
+        </button>
       </Link>
     </div>
   );
@@ -44,18 +37,9 @@ function ErrorContent() {
 
 export default function AuthErrorPage() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "var(--background)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "20px",
-      }}
-    >
-      <div className="card" style={{ width: "100%", maxWidth: "440px", padding: "40px 20px" }}>
-        <Suspense fallback={<div>Loading error details...</div>}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--background)" }}>
+      <div className="card" style={{ maxWidth: "400px", width: "100%" }}>
+        <Suspense fallback={<div style={{ textAlign: "center", padding: "40px" }}>Loading...</div>}>
           <ErrorContent />
         </Suspense>
       </div>
