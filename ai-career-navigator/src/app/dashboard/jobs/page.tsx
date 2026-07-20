@@ -248,8 +248,6 @@ export default function JobsPage() {
   const [editJob, setEditJob] = useState<Job | null>(null);
   const [view, setView] = useState<"kanban" | "list">("kanban");
 
-  useEffect(() => { fetchJobs(); }, []);
-
   const fetchJobs = async () => {
     try {
       const res = await fetch("/api/jobs");
@@ -261,6 +259,8 @@ export default function JobsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => { fetchJobs(); }, []);
 
   const handleSave = async (formData: Partial<Job>) => {
     const url = editJob ? `/api/jobs/${editJob.id}` : "/api/jobs";
@@ -432,7 +432,7 @@ export default function JobsPage() {
                 {jobs.length === 0 ? (
                   <tr>
                     <td colSpan={7} style={{ textAlign: "center", padding: "48px", color: "var(--text-muted)" }}>
-                      No applications yet. Click "Add Application" to get started.
+                      No applications yet. Click &quot;Add Application&quot; to get started.
                     </td>
                   </tr>
                 ) : (

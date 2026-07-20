@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -204,9 +205,9 @@ export default function SignInPage() {
         </div>
 
         <p style={{ textAlign: "center", marginTop: "24px", fontSize: "13px", color: "var(--text-muted)" }}>
-          <a href="/" style={{ color: "var(--text-muted)", textDecoration: "none" }}>
+          <Link href="/" style={{ color: "var(--text-muted)", textDecoration: "none" }}>
             ← Back to home
-          </a>
+          </Link>
         </p>
       </div>
     </div>

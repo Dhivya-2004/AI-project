@@ -40,21 +40,6 @@ export default function MatchingPage() {
   const [selectedJob, setSelectedJob] = useState<JobMatch | null>(null);
   const [sortBy, setSortBy] = useState<"score" | "salary">("score");
 
-  useEffect(() => {
-    checkResume();
-  }, []);
-
-  const checkResume = async () => {
-    const res = await fetch("/api/resume/latest");
-    if (res.ok) {
-      const data = await res.json();
-      if (data.resume) {
-        setHasResume(true);
-        fetchMatches();
-      }
-    }
-  };
-
   const fetchMatches = async () => {
     setLoading(true);
     try {
@@ -67,6 +52,22 @@ export default function MatchingPage() {
       setLoading(false);
     }
   };
+
+  const checkResume = async () => {
+    const res = await fetch("/api/resume/latest");
+    if (res.ok) {
+      const data = await res.json();
+      if (data.resume) {
+        setHasResume(true);
+        fetchMatches();
+      }
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    checkResume();
+  }, []);
 
   const sorted = [...matches].sort((a, b) =>
     sortBy === "score" ? b.matchScore - a.matchScore : 0

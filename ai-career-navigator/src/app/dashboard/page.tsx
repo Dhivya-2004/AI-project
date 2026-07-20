@@ -47,10 +47,6 @@ export default function DashboardPage() {
   const [recentJobs, setRecentJobs] = useState<RecentJob[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
       const [analyticsRes, jobsRes] = await Promise.all([
@@ -68,6 +64,11 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchData();
+  }, []);
 
   const firstName = session?.user?.name?.split(" ")[0] || "there";
 
@@ -94,7 +95,7 @@ export default function DashboardPage() {
               Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, {firstName}! 👋
             </h1>
             <p style={{ color: "var(--text-secondary)", fontSize: "15px" }}>
-              Here's your career progress overview
+              Here&apos;s your career progress overview
             </p>
           </div>
           <Link href="/dashboard/resume">

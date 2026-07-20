@@ -112,7 +112,7 @@ function analyzeHeuristically(text: string) {
     const match = l.match(addressRegex);
     if (match && match[1] && match[1].length > 5 && match[1].length < 100 && !l.toLowerCase().includes("university") && !l.toLowerCase().includes("college")) {
         // Strip off email or phone if accidentally captured
-        let cleanAddress = match[1].split('|')[0].trim();
+        const cleanAddress = match[1].split('|')[0].trim();
         extractedAddress = cleanAddress;
         break;
     }
@@ -150,6 +150,7 @@ function analyzeHeuristically(text: string) {
   }
 
   // Basic heuristic for Education
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const eduDetails: any[] = [];
   const degreeRegex = /\b(b\.?tech|b\.?e\.?|b\.?sc|m\.?tech|m\.?sc|bachelor|master|ph\.?d|diploma|secondary)\b/i;
   const institutionRegex = /\b(university|college|school|institute|academy)\b/i;
@@ -347,9 +348,11 @@ ${text.substring(0, 6000)}
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mergeAnalysis(heuristic: any, ai: any) {
   const merged = { ...heuristic, ...ai };
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isValid = (val: any) => {
     if (!val || typeof val !== 'string') return false;
     const lower = val.toLowerCase();

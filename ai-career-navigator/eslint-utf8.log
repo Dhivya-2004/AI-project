@@ -1,0 +1,139 @@
+﻿
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\prisma.config.ts
+  2:1  error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\api\resume\process\route.ts
+  115:13  error  'cleanAddress' is never reassigned. Use 'const' instead  prefer-const
+  153:21  error  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  350:35  error  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  350:44  error  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  353:25  error  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\auth\signin\page.tsx
+  207:11  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\analytics\page.tsx
+   15:3   warning  'LineChart' is defined but never used       @typescript-eslint/no-unused-vars
+   16:3   warning  'Line' is defined but never used            @typescript-eslint/no-unused-vars
+  220:21  warning  'width' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\jobs\page.tsx
+   47:43  warning  'onStatusChange' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  251:21  error    Error: Cannot access variable before it is declared
+
+`fetchJobs` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\jobs\page.tsx:251:21
+  249 |   const [view, setView] = useState<"kanban" | "list">("kanban");
+  250 |
+> 251 |   useEffect(() => { fetchJobs(); }, []);
+      |                     ^^^^^^^^^ `fetchJobs` accessed before it is declared
+  252 |
+  253 |   const fetchJobs = async () => {
+  254 |     try {
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\jobs\page.tsx:253:3
+  251 |   useEffect(() => { fetchJobs(); }, []);
+  252 |
+> 253 |   const fetchJobs = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 254 |     try {
+      | ^^^^^^^^^
+> 255 |       const res = await fetch("/api/jobs");
+      ΓÇª
+      | ^^^^^^^^^
+> 262 |     }
+      | ^^^^^^^^^
+> 263 |   };
+      | ^^^^^ `fetchJobs` is declared here
+  264 |
+  265 |   const handleSave = async (formData: Partial<Job>) => {
+  266 |     const url = editJob ? `/api/jobs/${editJob.id}` : "/api/jobs";  react-hooks/immutability
+  435:50  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  435:66  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\layout.tsx
+  26:10  warning  'mobileOpen' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  26:22  warning  'setMobileOpen' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\matching\page.tsx
+  44:5  error    Error: Cannot access variable before it is declared
+
+`checkResume` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\matching\page.tsx:44:5
+  42 |
+  43 |   useEffect(() => {
+> 44 |     checkResume();
+     |     ^^^^^^^^^^^ `checkResume` accessed before it is declared
+  45 |   }, []);
+  46 |
+  47 |   const checkResume = async () => {
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\matching\page.tsx:47:3
+  45 |   }, []);
+  46 |
+> 47 |   const checkResume = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |     const res = await fetch("/api/resume/latest");
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 49 |     if (res.ok) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 50 |       const data = await res.json();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 51 |       if (data.resume) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 52 |         setHasResume(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 53 |         fetchMatches();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |       }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |   };
+     | ^^^^^ `checkResume` is declared here
+  57 |
+  58 |   const fetchMatches = async () => {
+  59 |     setLoading(true);  react-hooks/immutability
+  45:6  warning  React Hook useEffect has a missing dependency: 'checkResume'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-hooks/exhaustive-deps
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\page.tsx
+  51:5   error  Error: Cannot access variable before it is declared
+
+`fetchData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\page.tsx:51:5
+  49 |
+  50 |   useEffect(() => {
+> 51 |     fetchData();
+     |     ^^^^^^^^^ `fetchData` accessed before it is declared
+  52 |   }, []);
+  53 |
+  54 |   const fetchData = async () => {
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\app\dashboard\page.tsx:54:3
+  52 |   }, []);
+  53 |
+> 54 |   const fetchData = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |     try {
+     | ^^^^^^^^^
+> 56 |       const [analyticsRes, jobsRes] = await Promise.all([
+     ΓÇª
+     | ^^^^^^^^^
+> 69 |     }
+     | ^^^^^^^^^
+> 70 |   };
+     | ^^^^^ `fetchData` is declared here
+  71 |
+  72 |   const firstName = session?.user?.name?.split(" ")[0] || "there";
+  73 |  react-hooks/immutability
+  97:19  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react/no-unescaped-entities
+
+C:\Users\DELL\Projects\AI-project\ai-career-navigator\src\types\next-auth.d.ts
+  1:8  warning  'NextAuth' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 21 problems (13 errors, 8 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
