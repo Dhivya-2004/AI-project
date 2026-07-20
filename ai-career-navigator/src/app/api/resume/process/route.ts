@@ -6,9 +6,11 @@ import OpenAI from "openai";
 async function extractText(buffer: Buffer, mimeType: string, fileName: string): Promise<string> {
   try {
     if (mimeType === "application/pdf" || fileName.endsWith(".pdf")) {
-      const pdfParse = (await import("pdf-parse")).default;
-      const data = await pdfParse(buffer);
-      return data.text;
+      const { PDFParse } = await import("pdf-parse");
+      const parser = new PDFParse({ data: new Uint8Array(buffer) });
+      await parser.load();
+      const textResult = await parser.getText();
+      return textResult.text;
     } else if (
       mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
       fileName.endsWith(".docx")
@@ -112,7 +114,7 @@ function analyzeHeuristically(text: string) {
     const match = l.match(addressRegex);
     if (match && match[1] && match[1].length > 5 && match[1].length < 100 && !l.toLowerCase().includes("university") && !l.toLowerCase().includes("college")) {
         // Strip off email or phone if accidentally captured
-        const cleanAddress = match[1].split('|')[0].trim();
+        let cleanAddress = match[1].split('|')[0].trim();
         extractedAddress = cleanAddress;
         break;
     }
@@ -150,7 +152,6 @@ function analyzeHeuristically(text: string) {
   }
 
   // Basic heuristic for Education
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const eduDetails: any[] = [];
   const degreeRegex = /\b(b\.?tech|b\.?e\.?|b\.?sc|m\.?tech|m\.?sc|bachelor|master|ph\.?d|diploma|secondary)\b/i;
   const institutionRegex = /\b(university|college|school|institute|academy)\b/i;
@@ -348,11 +349,9 @@ ${text.substring(0, 6000)}
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mergeAnalysis(heuristic: any, ai: any) {
   const merged = { ...heuristic, ...ai };
   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isValid = (val: any) => {
     if (!val || typeof val !== 'string') return false;
     const lower = val.toLowerCase();

@@ -1,5 +1,4 @@
 import path from "node:path";
-// @ts-expect-error: prisma/config lacks types
 import { defineConfig } from "prisma/config";
 
 export default defineConfig({
