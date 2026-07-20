@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   basePath: "/api/auth",
   trustHost: true,
+  secret: process.env.AUTH_SECRET || "fallback-secret-for-netlify-demo-1234567890",
   providers: [
     Credentials({
       name: "credentials",
