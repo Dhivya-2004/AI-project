@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   env: {
     AUTH_SECRET: "ai-career-navigator-super-secret-key-2024",
     AUTH_TRUST_HOST: "true",
+    AUTH_URL: "https://airesumecareer.netlify.app",
   },
 };
 

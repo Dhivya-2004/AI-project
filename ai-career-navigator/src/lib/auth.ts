@@ -1,11 +1,18 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { prisma } from "@/lib/db";
+
+if (!process.env.AUTH_SECRET) {
+  process.env.AUTH_SECRET = "ai-career-navigator-super-secret-key-2024";
+}
+process.env.AUTH_TRUST_HOST = "true";
+if (!process.env.AUTH_URL) {
+  process.env.AUTH_URL = "https://airesumecareer.netlify.app";
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   basePath: "/api/auth",
   trustHost: true,
-  secret: process.env.AUTH_SECRET || "fallback-secret-for-netlify-demo-1234567890",
+  secret: process.env.AUTH_SECRET,
   providers: [
     Credentials({
       name: "credentials",
@@ -24,8 +31,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         try {
+          const { prisma } = await import("@/lib/db");
           if (isSignUp) {
-            // Create new user
             const existingUser = await prisma.user.findUnique({ where: { email } });
             if (existingUser) throw new Error("User already exists");
 
@@ -34,15 +41,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             });
             return { id: user.id, email: user.email, name: user.name };
           } else {
-            // Sign in existing user
             const user = await prisma.user.findUnique({ where: { email } });
             if (!user || user.password !== password) throw new Error("Invalid credentials");
             return { id: user.id, email: user.email, name: user.name };
           }
-        } catch (error: any) {
-          console.error("Auth Error (Fallback to Demo User):", error);
-          // If Prisma fails (e.g., read-only SQLite on Netlify), return a demo user
-          // so the user can still access the dashboard.
+        } catch {
           return { id: "demo-user-123", email: email, name: name || email.split("@")[0] };
         }
       },
