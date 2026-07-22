@@ -1,18 +1,10 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-if (!process.env.AUTH_SECRET) {
-  process.env.AUTH_SECRET = "ai-career-navigator-super-secret-key-2024";
-}
-process.env.AUTH_TRUST_HOST = "true";
-if (!process.env.AUTH_URL) {
-  process.env.AUTH_URL = "https://airesumecareer.netlify.app";
-}
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   basePath: "/api/auth",
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: "ai-career-navigator-super-secret-key-2024",
   providers: [
     Credentials({
       name: "credentials",
