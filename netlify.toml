@@ -1,0 +1,13 @@
+[build]
+  base = "ai-career-navigator"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  CI = "false"
+  AUTH_SECRET = "ai-career-navigator-super-secret-key-2024"
+  AUTH_TRUST_HOST = "true"
+  AUTH_URL = "https://airesumecareer.netlify.app"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
